@@ -26,7 +26,7 @@
             line-height: 1.8;
             overflow-x: hidden;
             
-            /* 新增：柔和優雅的 Wallpaper 背景，加上 90% 的象牙白遮罩確保文字清晰 */
+            /* 柔和優雅的 Wallpaper 背景 */
             background: linear-gradient(rgba(253, 252, 249, 0.90), rgba(253, 252, 249, 0.90)), 
                         url('https://images.unsplash.com/photo-1528458909336-e7a0adfed0a5?auto=format&fit=crop&w=1920&q=80') center/cover fixed;
         }
@@ -75,19 +75,28 @@
             color: #fff;
         }
 
-        /* 語言顯示控制 */
         .lang-zh { display: none; }
         
-        /* 首圖區域 (Hero Section) - sun1.jpeg */
+        /* =========================================
+           首圖區域 (Hero Section) - 已優化圖片定位
+           ========================================= */
         .hero {
             height: 100vh;
+            min-height: 600px; /* 防止視窗太扁時過度裁切 */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            background: url('https://raw.githubusercontent.com/innocodetech/wedding/main/sun1.jpeg') center/cover no-repeat;
-            background-attachment: fixed; /* 視差滾動 */
+            
+            /* 將背景設定為置中，並確保覆蓋區塊 */
+            background-image: url('https://raw.githubusercontent.com/innocodetech/wedding/main/sun1.jpeg');
+            background-position: center center; /* 鎖定在正中央 */
+            background-size: cover;
+            background-repeat: no-repeat;
+            /* 取消 fixed，避免螢幕比例導致的嚴重走位 */
+            background-attachment: scroll; 
+            
             position: relative;
         }
 
@@ -95,7 +104,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.35); /* 增加透明度以突出文字 */
+            background: rgba(255, 255, 255, 0.35); 
             z-index: 1;
         }
 
@@ -174,7 +183,7 @@
             background: #ffffff;
             padding: 50px 40px;
             margin-bottom: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.06); /* 加深陰影讓卡片在背景上更立體 */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.06);
             border-radius: 12px;
             position: relative;
             border-top: 4px solid var(--primary-color);
@@ -222,12 +231,20 @@
             color: var(--primary-color);
         }
 
-        /* 視差照片過場 (Parallax Break) */
+        /* =========================================
+           照片過場 (Photo Break) - 已優化圖片定位
+           ========================================= */
         .photo-break {
-            height: 450px;
-            background-position: center 20%; 
-            background-size: cover;
-            background-attachment: fixed; 
+            /* 使用 vh 動態高度，確保在不同螢幕上比例和諧 */
+            height: 50vh; 
+            min-height: 350px; /* 設定最低高度 */
+            max-height: 600px; /* 設定最高高度，防止在大螢幕上過於巨大 */
+            
+            background-position: center center; /* 鎖定焦點在正中央 */
+            background-size: cover; /* 保持填滿區塊 */
+            background-repeat: no-repeat;
+            background-attachment: scroll; /* 取消 fixed 視差，根治裁切問題 */
+            
             margin: 40px 0;
             position: relative;
             box-shadow: inset 0 10px 20px rgba(0,0,0,0.05), inset 0 -10px 20px rgba(0,0,0,0.05);
@@ -237,7 +254,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.05); /* 輕微調暗一點點讓整體質感更好 */
         }
 
         .pb-1 { background-image: url('https://raw.githubusercontent.com/innocodetech/wedding/main/sun2.jpeg'); }
@@ -248,7 +265,7 @@
         .gallery-container {
             text-align: center;
             padding: 80px 20px 120px; 
-            background: rgba(255, 255, 255, 0.7); /* 半透明底色融入背景 */
+            background: rgba(255, 255, 255, 0.7);
             border-top: 1px solid rgba(0,0,0,0.05);
         }
 
@@ -297,13 +314,17 @@
             margin-top: 20px;
         }
 
-        /* 手機版適配 */
+        /* 手機版適配 - 加入更多彈性調整 */
         @media (max-width: 768px) {
-            .hero-content { padding: 30px 20px; width: 80%; }
+            .hero-content { padding: 30px 20px; width: 85%; }
             .hero h1 { font-size: 2.2rem; }
             .hero .date-highlight { font-size: 2.5rem; letter-spacing: 6px; }
+            
+            section { padding: 60px 15px; }
             .event-card { padding: 30px 20px; }
-            .photo-break { background-attachment: scroll; height: 350px; }
+            
+            /* 手機螢幕長條，縮小高度以防比例太奇怪 */
+            .photo-break { height: 40vh; min-height: 250px; } 
             header { padding: 15px 20px; }
         }
     </style>
@@ -441,23 +462,15 @@
             const btn = document.querySelector('.lang-toggle');
 
             if (currentLang === 'en') {
-                // 切換為中文
                 enElements.forEach(el => el.style.display = 'none');
                 zhElements.forEach(el => el.style.display = 'inline-block'); 
-                
-                // 特殊處理需要 block 的元素
                 document.querySelectorAll('h1.lang-zh, h2.lang-zh, span.lang-zh.block').forEach(el => el.style.display = 'block');
-
                 btn.textContent = 'English';
                 currentLang = 'zh';
             } else {
-                // 切換為英文
                 zhElements.forEach(el => el.style.display = 'none');
                 enElements.forEach(el => el.style.display = 'inline-block');
-                
-                // 特殊處理需要 block 的元素
                 document.querySelectorAll('h1.lang-en, h2.lang-en, span.lang-en.block').forEach(el => el.style.display = 'block');
-
                 btn.textContent = '繁體中文';
                 currentLang = 'en';
             }
